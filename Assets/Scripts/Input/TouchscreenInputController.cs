@@ -1,4 +1,5 @@
-﻿using Ui;
+﻿using Extensions;
+using Ui;
 using UnityEngine;
 
 namespace InputSystem
@@ -19,7 +20,7 @@ namespace InputSystem
         protected override bool GetDirection(out Vector3 direction)
         {
             direction = _joystick.Direction;
-            return direction.sqrMagnitude > float.Epsilon;
+            return !direction.IsZero();
         }
 
         protected override bool GetEulerAnglesRotation(out Vector2 eulerAnglesRotation)
