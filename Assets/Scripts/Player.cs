@@ -9,15 +9,18 @@ public class Player : MonoBehaviour
 
     private CharacterController _characterController;
     private IInputController _inputController;
+    private Camera _camera;
 
     public void Awake()
     {
         _characterController = GetComponent<CharacterController>();
+        _camera = GetComponentInChildren<Camera>();
 
 #if UNITY_STANDALONE
-        _inputController = gameObject.AddComponent<MouseKeyboardInputController>();
-#else
-        _inputController = gameObject.AddComponent<TouchInputController>();
+        _inputController = gameObject.AddComponent<StandaloneInputController>();
+#endif
+#if UNITY_ANDROID || UNITY_IOS
+        _inputController = gameObject.AddComponent<TouchscreenInputController>();
 #endif
         _inputController.AddListener(Move);
     }
@@ -29,7 +32,8 @@ public class Player : MonoBehaviour
 
     private void Move(Vector3 direction, Quaternion rotation)
     {
-        transform.rotation *= rotation;
-        _characterController.Move(transform.rotation * direction * _speed * Time.deltaTime);        
+        Quaternion fullRotation = _camera.transform.rotation * rotation;
+        _camera.transform.eulerAngles = new Vector3(fullRotation.eulerAngles.x, fullRotation.eulerAngles.y);  
+        _characterController.Move(_camera.transform.rotation * direction * _speed * Time.deltaTime);        
     }
 }
