@@ -22,9 +22,14 @@ public class Player : MonoBehaviour
         _inputController.AddListener(Move);
     }
 
+    public void FixedUpdate()
+    {
+        _characterController.Move(Physics.gravity * Time.fixedDeltaTime);
+    }
+
     private void Move(Vector3 direction, Quaternion rotation)
     {
         transform.rotation *= rotation;
-        _characterController.SimpleMove(transform.rotation * direction * _speed);        
+        _characterController.Move(transform.rotation * direction * _speed * Time.deltaTime);        
     }
 }
