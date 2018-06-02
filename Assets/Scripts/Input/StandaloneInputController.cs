@@ -10,10 +10,10 @@ namespace InputSystem
             public const string Horizontal = "Horizontal";
             public const string Vertical = "Vertical";
             public const string MouseX = "Mouse X";
-            public const string MouseY = "Mouse Y";
+            public const string MouseY = "Mouse Y";            
         }
 
-        public void Awake()
+        public void Start()
         {
             Cursor.visible = false;
         }
@@ -31,6 +31,16 @@ namespace InputSystem
             eulerAnglesRotation = new Vector2(Input.GetAxis(AxisNames.MouseX),
                 Input.GetAxis(AxisNames.MouseY));
             return !eulerAnglesRotation.IsZero();
+        }
+
+        protected override Vector2 GetPositionOnScreen()
+        {
+            return Input.mousePosition;
+        }
+
+        protected override bool IsPressed()
+        {
+            return Input.GetMouseButtonDown(0);
         }
     }
 }

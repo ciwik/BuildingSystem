@@ -11,7 +11,6 @@ namespace Ui
         private float _knobHalfSize, _sqrInnerRadius,_sqrOutterRadius;
 
         public Vector3 Direction { get; private set; }
-        public bool IsFocused { get; private set; }
 
         public void Awake()
         {
@@ -66,14 +65,12 @@ namespace Ui
         public void OnPointerDown(PointerEventData eventData)
         {
             OnDrag(eventData);
-            IsFocused = true;
         }
 
         public void OnPointerUp(PointerEventData eventData)
         {
             _knob.rectTransform.localPosition = _background.rectTransform.rect.center;
             Direction = Vector3.zero;
-            IsFocused = false;
         }
     }
 }
