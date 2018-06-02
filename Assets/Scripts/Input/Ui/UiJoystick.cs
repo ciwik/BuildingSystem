@@ -12,7 +12,7 @@ namespace Ui
 
         public Vector3 Direction { get; private set; }
 
-        public void Awake()
+        internal void Awake()
         {
             _background = GetComponent<Image>();
             _knob = transform.GetChild(0).GetComponent<Image>();
@@ -20,7 +20,7 @@ namespace Ui
             Direction = Vector3.zero;
         }
 
-        public void Start()
+        internal void Start()
         {
             _knobHalfSize = 0.5f * _knob.rectTransform.rect.height / _background.rectTransform.rect.height;
             _sqrInnerRadius = Mathf.Pow(0.5f - _knobHalfSize, 2);

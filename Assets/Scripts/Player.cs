@@ -7,53 +7,44 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float _speed = 10f;
     [SerializeField]
-    private Builder _builder;
-    [SerializeField]
-    private UiBuildingsInventory _buildingsInventory;
+    private Builder _builder;    
 
     private CharacterController _characterController;
     private IInputController _inputController;
     private Camera _camera;    
 
-    public void Awake()
+    internal void Awake()
     {
         _characterController = GetComponent<CharacterController>();
         _camera = GetComponentInChildren<Camera>();
         _builder = FindObjectOfType<Builder>();
 
-        InitListeners();
-    }
-
-    public void FixedUpdate()
-    {
-        _characterController.Move(Physics.gravity * Time.fixedDeltaTime);
-    }
-
-    private void InitListeners()
-    {
 #if UNITY_STANDALONE
         _inputController = gameObject.AddComponent<StandaloneInputController>();
 #endif
 #if UNITY_ANDROID || UNITY_IOS
         _inputController = gameObject.AddComponent<TouchscreenInputController>();
 #endif
-        _inputController.WithMoveListener(Move);
-        _inputController.WithRaycastingListener(_builder.PlaceBlock);
-        _inputController.WithBuildListener(() =>
-        {
-            _builder.Build();
-            _buildingsInventory.Reset();
-        });
+    }
 
-        _buildingsInventory.WithInventoryItemListeners(b =>
-        {
-            _builder.StartBuilding(b);
-            _inputController.StartBuilding();
-        }, () =>
-        {
-            _builder.ResetBuilding();
-            _inputController.StopBuilding();
-        });
+    internal void Start()
+    {
+        InitListeners();
+    }
+
+    internal void FixedUpdate()
+    {
+        _characterController.Move(Physics.gravity * Time.fixedDeltaTime);
+    }
+
+    private void InitListeners()
+    {
+        _inputController.WithMoveListener(Move)
+            .WithRaycastingListener(_builder.PlaceBlock)
+            .WithBuildListeners(buildAction:_builder.Build, 
+                buildingCancelAction:_builder.ResetBuilding)
+            .WithItemSelectListeners(blockItemSelectAction:_builder.StartBuilding, 
+                blockItemResetAction:_builder.ResetBuilding);
     }
 
     private void Move(Vector3 direction, Quaternion rotation)

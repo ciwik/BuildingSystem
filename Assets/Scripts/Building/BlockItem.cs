@@ -2,7 +2,7 @@
 using UnityEngine;
 
 [Serializable]
-public class BuildingItem {
+public class BlockItem {
     public string Title
     {
         get { return _title; }

@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Linq;
 using Assets.Scripts.Building;
-using Extensions;
 using UnityEngine;
 
 public class Builder : MonoBehaviour
 {
-    private BuildingItem _currentbuildingItem;
+    private BlockItem _currentbuildingItem;
     private Block _block;
     private MeshRenderer _buildingRenderer;
 
@@ -21,7 +20,7 @@ public class Builder : MonoBehaviour
     [SerializeField]
     private int _terrainLayer;
 
-    public void StartBuilding(BuildingItem buildingItem)
+    public void StartBuilding(BlockItem blockItem)
     {
         if (_block != null)
         {
@@ -29,7 +28,7 @@ public class Builder : MonoBehaviour
             _block = null;
         }
 
-        _currentbuildingItem = buildingItem;
+        _currentbuildingItem = blockItem;
 
         _block = Instantiate(_currentbuildingItem.Prefab);
         _buildingRenderer = _block.GetComponent<MeshRenderer>();
@@ -44,6 +43,42 @@ public class Builder : MonoBehaviour
         }
 
         _currentbuildingItem = null;        
+    }
+
+    public bool PlaceBlock(RaycastHit raycastHit)
+    {
+        //TODO: remove
+        if (_block == null)
+        {
+            return false;
+        }
+
+        //If user try to build block on hill then refuse.
+        //'raycastHit.normal.y < _normalThreshold' is the same as 'Vector3.Dot(raycastHit.normal, Vector3.up) < _normalThreshold',
+        //because 'raycastHit.normal' is normalized
+        if (raycastHit.normal.y < _normalThreshold)
+        {
+            return FillPreview(false);
+        }
+
+        _block.transform.position = raycastHit.point + 0.5f * _block.transform.localScale.y * raycastHit.normal;
+        _block.transform.up = raycastHit.normal;
+
+        //Get heighbour blocks
+        Collider[] sphereIntersections = Physics.OverlapSphere(raycastHit.point, _block.transform.localScale.magnitude, 1 << _blocksLayer);
+        if (sphereIntersections.Length != 0)
+        {
+            Func<Collider, float> getDistance = col => Vector3.Distance(col.transform.position, raycastHit.point);
+            var nearestBlock = sphereIntersections
+                .Aggregate((col1, col2) => getDistance(col1) < getDistance(col2) ? col1 : col2)
+                .gameObject.GetComponent<Block>();
+
+            FitValidator.Fit(nearestBlock, _block);
+            return FillPreview(true);
+        }
+
+        var canBePlacedOn = CanBePlacedOn(raycastHit.transform.gameObject);
+        return FillPreview(canBePlacedOn);
     }
 
     public void Build()
@@ -70,35 +105,5 @@ public class Builder : MonoBehaviour
 
         var otherBlock = otherObject.GetComponent<Block>();
         return otherBlock != null && otherBlock.Type != _block.Type;
-    }
-
-    public bool PlaceBlock(RaycastHit raycastHit)
-    {
-        //If user try to build block on hill then refuse.
-        //'raycastHit.normal.y < _normalThreshold' is the same as 'Vector3.Dot(raycastHit.normal, Vector3.up) < _normalThreshold',
-        //because 'raycastHit.normal' is normalized
-        if (raycastHit.normal.y < _normalThreshold)
-        {
-            return FillPreview(false);
-        }
-
-        _block.transform.position = raycastHit.point + 0.5f * _block.transform.localScale.y * raycastHit.normal;
-        _block.transform.up = raycastHit.normal;
-
-        //Get heighbour blocks
-        Collider[] sphereIntersections = Physics.OverlapSphere(raycastHit.point, _block.transform.localScale.magnitude, 1 << _blocksLayer);        
-        if (sphereIntersections.Length != 0)
-        {
-            Func<Collider, float> getDistance = col => Vector3.Distance(col.transform.position, raycastHit.point);
-            var nearestBlock = sphereIntersections
-                .Aggregate((col1, col2) => getDistance(col1) < getDistance(col2) ? col1 : col2)
-                .gameObject.GetComponent<Block>();
-
-            FitValidator.Fit(nearestBlock, _block);
-            return FillPreview(true);
-        }
-
-        var canBePlacedOn = CanBePlacedOn(raycastHit.transform.gameObject);
-        return FillPreview(canBePlacedOn);
     }
 }

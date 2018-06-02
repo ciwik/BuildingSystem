@@ -5,10 +5,9 @@ namespace InputSystem
 {
     public interface IInputController
     {
-        void WithMoveListener(Action<Vector3, Quaternion> moveAction);
-        void WithBuildListener(Action buildAction);
-        void WithRaycastingListener(Func<RaycastHit, bool> raycastAction);
-        void StartBuilding();
-        void StopBuilding();
+        IInputController WithMoveListener(Action<Vector3, Quaternion> moveAction);        
+        IInputController WithRaycastingListener(Func<RaycastHit, bool> raycastAction);
+        IInputController WithBuildListeners(Action buildAction, Action buildingCancelAction);
+        IInputController WithItemSelectListeners(Action<BlockItem> blockItemSelectAction, Action blockItemResetAction);
     }
 }

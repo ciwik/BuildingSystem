@@ -10,12 +10,33 @@ namespace InputSystem
             public const string Horizontal = "Horizontal";
             public const string Vertical = "Vertical";
             public const string MouseX = "Mouse X";
-            public const string MouseY = "Mouse Y";            
+            public const string MouseY = "Mouse Y";
         }
 
-        public void Start()
+        internal void Start()
         {
             Cursor.visible = false;
+        }
+
+        internal override void Update()
+        {
+            base.Update();
+            if (Input.anyKeyDown)
+            {
+                if (Input.GetKeyDown(KeyCode.Escape))
+                {
+                    CancelBuilding();
+                    return;
+                }
+                for (var key = KeyCode.Alpha1; key < KeyCode.Alpha9; key++)
+                {
+                    if (Input.GetKeyDown(key))
+                    {                        
+                        SelectItem(key - KeyCode.Alpha0 - 1);
+                        return;
+                    }
+                }
+            }
         }
 
         protected override bool GetDirection(out Vector3 direction)

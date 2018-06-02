@@ -5,47 +5,58 @@ namespace InputSystem
 {
     public abstract class AbstractInputController : MonoBehaviour, IInputController
     {
-        private Action<Vector3, Quaternion> _moveAction;
-        private Action _buildAction;
+        private Action<Vector3, Quaternion> _moveAction;        
         private Func<RaycastHit, bool> _raycastAction;
+        private Action _buildAction;
+        private Action _buildingCancelAction;        
+        private Action<BlockItem> _blockItemSelectAction;
+        private Action _blockItemResetAction;
+
+        private UiBuildingsInventory _buildingsInventory;
 
         private Vector2 _sensitivity = new Vector2(1f, 1f);        
-        protected bool isBuilding;
+        private bool _isBuilding;
 
-        public void WithMoveListener(Action<Vector3, Quaternion> moveAction)
+        internal virtual void Awake()
+        {
+            _buildingsInventory = FindObjectOfType<UiBuildingsInventory>();
+        }
+
+        public IInputController WithMoveListener(Action<Vector3, Quaternion> moveAction)
         {
             _moveAction = moveAction;
+            return this;
         }
 
-        public void WithBuildListener(Action buildAction)
+        public IInputController WithBuildListeners(Action buildAction, Action buildingCancelAction)
         {
-            _buildAction = buildAction;
+            _buildAction = buildAction + _buildingsInventory.Reset + StopBuilding;
+            _buildingCancelAction = buildingCancelAction + _buildingsInventory.Reset + StopBuilding;
+            return this;
         }
 
-        public void WithRaycastingListener(Func<RaycastHit, bool> raycastAction)
+        public IInputController WithRaycastingListener(Func<RaycastHit, bool> raycastAction)
         {
             _raycastAction = raycastAction;
+            return this;
         }
 
-        protected abstract bool GetDirection(out Vector3 direction);
-        protected abstract bool GetEulerAnglesRotation(out Vector2 eulerAnglesRotation);
-        protected abstract Vector2 GetPositionOnScreen();
-        protected abstract bool IsPressed();
-
-
-        public void StartBuilding()
+        public IInputController WithItemSelectListeners(Action<BlockItem> blockItemSelectAction, Action blockItemResetAction)
         {
-            isBuilding = true;
+            _blockItemSelectAction = b =>
+            {
+                StartBuilding();
+                blockItemSelectAction(b);
+                OnItemSelected();
+            };
+            _blockItemResetAction = blockItemResetAction + StopBuilding;
+            _buildingsInventory.WithInventoryItemListeners(_blockItemSelectAction, _blockItemResetAction);
+            return this;
         }
 
-        public void StopBuilding()
+        internal virtual void Update()
         {
-            isBuilding = false;
-        }
-
-        public virtual void Update()
-        {
-            if (isBuilding)
+            if (_isBuilding)
             {
                 UpdateBuilding();
             }
@@ -54,6 +65,27 @@ namespace InputSystem
                 UpdateMove();
             }
         }
+
+        protected abstract bool GetDirection(out Vector3 direction);
+        protected abstract bool GetEulerAnglesRotation(out Vector2 eulerAnglesRotation);
+        protected abstract Vector2 GetPositionOnScreen();
+        protected abstract bool IsPressed();
+        protected virtual void OnItemSelected() { }
+
+        protected void CancelBuilding()
+        {
+            _buildingCancelAction();
+        }        
+
+        protected void SelectItem(BlockItem item)
+        {
+            _blockItemSelectAction(item);
+        }
+
+        protected void SelectItem(int itemIndex)
+        {
+            SelectItem(_buildingsInventory.Select(itemIndex));
+        }       
 
         private void UpdateMove()
         {
@@ -64,7 +96,7 @@ namespace InputSystem
                 Quaternion rotation = Quaternion.Euler(-eulerAnglesRotation.y * _sensitivity.y,
                     eulerAnglesRotation.x * _sensitivity.x,
                     0f);
-                _moveAction.Invoke(direction, rotation);
+                _moveAction(direction, rotation);
             }
         }
 
@@ -77,13 +109,22 @@ namespace InputSystem
             {
                 if (Vector3.Distance(Camera.main.transform.position, raycastHit.point) < 30f)
                 {
-                    if (_raycastAction(raycastHit) && IsPressed())
-                    {
-                        StopBuilding();
+                    if (_raycastAction(raycastHit) && IsPressed() && _isBuilding)
+                    {                        
                         _buildAction();
                     }
                 }               
             }                  
+        }
+
+        private void StartBuilding()
+        {
+            _isBuilding = true;
+        }
+
+        private void StopBuilding()
+        {
+            _isBuilding = false;
         }
     }
 }

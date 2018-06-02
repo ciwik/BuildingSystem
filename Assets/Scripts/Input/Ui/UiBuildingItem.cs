@@ -14,14 +14,14 @@ public class UiBuildingItem : MonoBehaviour
     [SerializeField]
     private Color _unselectedColor;
 
-    public void Awake()
+    internal void Awake()
     {
         _text = GetComponentInChildren<Text>();
         _button = GetComponent<Button>();
         _image = GetComponent<Image>();        
     }
 
-    public void Start()
+    internal void Start()
     {
         Unselect();
     }

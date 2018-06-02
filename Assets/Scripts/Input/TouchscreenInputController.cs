@@ -11,23 +11,42 @@ namespace InputSystem
     {
         private UiJoystick _joystick;
         private Button _buildButton;
+        private Button _buildCancelledButton;
 
-        public void Start()
+        internal override void Awake()
         {
+            base.Awake();
+            Input.backButtonLeavesApp = true;
+        }
+
+        internal void Start()
+        {            
             var canvas = FindObjectOfType<Canvas>();
             _joystick = canvas.GetComponentInChildren<UiJoystick>(includeInactive: true);
-            _buildButton = canvas.GetComponentInChildren<Button>(includeInactive: true);
+            var childs = canvas.GetComponentInChildren<Buttons>(includeInactive: true);
+            _buildButton = childs.BuildButton;
+            _buildCancelledButton = childs.BuildCancelledButton;
             _joystick.gameObject.SetActive(true);
             _buildButton.gameObject.SetActive(true);
             _buildButton.onClick.AddListener(PressBuild);
 
-            Input.backButtonLeavesApp = true;
+            _buildCancelledButton.onClick.AddListener(() =>
+            {
+                CancelBuilding();
+                _buildCancelledButton.gameObject.SetActive(false);
+            });
+
         }
 
-        public override void Update()
+        internal override void Update()
         {
             base.Update();
             _buttonWasPressed = false;
+        }
+
+        protected override void OnItemSelected()
+        {
+            _buildCancelledButton.gameObject.SetActive(true);
         }
 
         protected override bool GetDirection(out Vector3 direction)
@@ -62,6 +81,16 @@ namespace InputSystem
             return false;
         }
 
+        protected override bool IsPressed()
+        {
+            if (_buttonWasPressed)
+            {
+                _buttonWasPressed = false;
+                return true;
+            }
+            return false;
+        }
+
         private Vector2 _prevPosition;
         protected override Vector2 GetPositionOnScreen()
         {
@@ -83,7 +112,8 @@ namespace InputSystem
         private bool _buttonWasPressed = false;
         private void PressBuild()
         {
-            _buttonWasPressed = isBuilding;
+            _buttonWasPressed = true;
+            _buildCancelledButton.gameObject.SetActive(false);
         }
 
         private bool IsPointOverUi(Vector2 position)
@@ -93,16 +123,6 @@ namespace InputSystem
             var results = new List<RaycastResult>();
             EventSystem.current.RaycastAll(eventData, results);
             return results.Count != 0;
-        }
-
-        protected override bool IsPressed()
-        {
-            if (_buttonWasPressed)
-            {
-                _buttonWasPressed = false;
-                return true;
-            }
-            return false;
         }
     }
 }
