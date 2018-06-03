@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Assets.Scripts.Building;
+using Building;
 using UnityEngine;
 
 public class Builder : MonoBehaviour
@@ -73,8 +73,8 @@ public class Builder : MonoBehaviour
                 .Aggregate((col1, col2) => getDistance(col1) < getDistance(col2) ? col1 : col2)
                 .gameObject.GetComponent<Block>();
 
-            FitValidator.Fit(nearestBlock, _block);
-            return FillPreview(true);
+            var canBeFitted = AdhesionValidator.TryFit(nearestBlock, _block);
+            return FillPreview(canBeFitted);
         }
 
         var canBePlacedOn = CanBePlacedOn(raycastHit.transform.gameObject);
