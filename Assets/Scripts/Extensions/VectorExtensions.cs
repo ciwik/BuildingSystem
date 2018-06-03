@@ -6,12 +6,15 @@ namespace Extensions
     {
         public static bool IsZero(this Vector2 vector)
         {
-            return vector.x < float.Epsilon && vector.y < float.Epsilon;
+            return vector == Vector2.zero || (Mathf.Abs(vector.x) < float.Epsilon &&
+                Mathf.Abs(vector.y) < float.Epsilon);
         }
 
         public static bool IsZero(this Vector3 vector)
         {
-            return vector.x < float.Epsilon && vector.y < float.Epsilon && vector.z < float.Epsilon;
+            return vector == Vector3.zero || (Mathf.Abs(vector.x) < float.Epsilon && 
+                Mathf.Abs(vector.y) < float.Epsilon &&
+                Mathf.Abs(vector.z) < float.Epsilon);
         }
 
         public static float Min(this Vector2 vector)
