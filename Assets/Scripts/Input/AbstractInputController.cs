@@ -1,4 +1,6 @@
 ﻿using System;
+using Building;
+using Ui;
 using UnityEngine;
 
 namespace InputSystem
@@ -86,7 +88,12 @@ namespace InputSystem
 
         protected void SelectItem(int itemIndex)
         {
-            SelectItem(_buildingsInventory.Select(itemIndex));
+            BlockItem item;
+            if (!_buildingsInventory.TrySelect(itemIndex, out item))
+            {
+                return;
+            }
+            SelectItem(item);
         }
 
         private void UpdateMove()

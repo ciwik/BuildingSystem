@@ -1,43 +1,46 @@
 ﻿using UnityEngine;
 
-public class Wall : Block
+namespace Building.Blocks
 {
-    public override BlockType Type => BlockType.Wall;
-
-    public override bool CanFitWith(Block other)
+    public class Wall : Block
     {
-        if (other.Type == BlockType.Foundation)
+        public override BlockType Type => BlockType.Wall;
+
+        public override bool CanFitWith(Block other)
         {
-            var diff = transform.position - other.transform.position;
-
-            if (Mathf.Abs(diff.y) > Mathf.Abs(diff.z) && Mathf.Abs(diff.y) > Mathf.Abs(diff.x))
+            if (other.Type == BlockType.Foundation)
             {
-                var shift = Vector3.zero;
+                var diff = transform.position - other.transform.position;
 
-                if (Mathf.Abs(diff.x) > Mathf.Abs(diff.z))
+                if (Mathf.Abs(diff.y) > Mathf.Abs(diff.z) && Mathf.Abs(diff.y) > Mathf.Abs(diff.x))
                 {
-                    shift = 0.5f * (other.transform.localScale.z - transform.localScale.z) *
-                            transform.forward;
-                }
-                else
-                {
-                    shift = 0.5f * (other.transform.localScale.x - transform.localScale.z) *
-                            transform.forward;
-                }
-                shift.y = 0.5f * (other.transform.localScale.y + transform.localScale.y);
+                    var shift = Vector3.zero;
 
-                other.transform.position = transform.position + shift;
-                return true;
+                    if (Mathf.Abs(diff.x) > Mathf.Abs(diff.z))
+                    {
+                        shift = 0.5f * (other.transform.localScale.z - transform.localScale.z) *
+                                transform.forward;
+                    }
+                    else
+                    {
+                        shift = 0.5f * (other.transform.localScale.x - transform.localScale.z) *
+                                transform.forward;
+                    }
+                    shift.y = 0.5f * (other.transform.localScale.y + transform.localScale.y);
+
+                    other.transform.position = transform.position + shift;
+                    return true;
+                }
+
+                return false;
             }
 
             return false;
         }
 
-        return false;
-    }
-
-    public override bool CanFitWith(Block[] others)
-    {
-        throw new System.NotImplementedException();
+        public override bool CanFitWith(Block[] others)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

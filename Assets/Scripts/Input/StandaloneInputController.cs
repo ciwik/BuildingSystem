@@ -13,6 +13,8 @@ namespace InputSystem
             public const string MouseY = "Mouse Y";
         }
 
+        private KeyCode _cancelKey = KeyCode.Escape;
+
         internal void Start()
         {
             Cursor.visible = false;
@@ -23,7 +25,7 @@ namespace InputSystem
             base.Update();
             if (Input.anyKeyDown)
             {
-                if (Input.GetKeyDown(KeyCode.Escape))
+                if (Input.GetKeyDown(_cancelKey))
                 {
                     CancelBuilding();
                     return;

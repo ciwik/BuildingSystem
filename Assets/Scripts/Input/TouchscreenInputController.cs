@@ -23,19 +23,19 @@ namespace InputSystem
         {            
             var canvas = FindObjectOfType<Canvas>();
             _joystick = canvas.GetComponentInChildren<UiJoystick>(includeInactive: true);
-            var childs = canvas.GetComponentInChildren<UiButtons>(includeInactive: true);
-            _buildButton = childs.BuildButton;
-            _buildCancelledButton = childs.BuildCancelledButton;
+
+            var buttons = canvas.GetComponentInChildren<UiButtons>(includeInactive: true);
+            _buildButton = buttons.BuildButton;
+            _buildCancelledButton = buttons.BuildCancelledButton;
+
             _joystick.gameObject.SetActive(true);
             _buildButton.gameObject.SetActive(true);
             _buildButton.onClick.AddListener(PressBuild);
-
             _buildCancelledButton.onClick.AddListener(() =>
             {
                 CancelBuilding();
                 _buildCancelledButton.gameObject.SetActive(false);
             });
-
         }
 
         internal override void Update()

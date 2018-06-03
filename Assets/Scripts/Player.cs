@@ -1,4 +1,5 @@
-﻿using InputSystem;
+﻿using Building;
+using InputSystem;
 using UnityEngine;
 
 [RequireComponent(typeof(Camera), typeof(CharacterController))]

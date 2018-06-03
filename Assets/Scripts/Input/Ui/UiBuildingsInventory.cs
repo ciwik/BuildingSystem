@@ -1,61 +1,66 @@
 ﻿using System;
 using System.Collections.Generic;
+using Building;
 using UnityEngine;
 
-public class UiBuildingsInventory : MonoBehaviour
+namespace Ui
 {
-    private UiBuildingItem _currentUiItem;
-    private Action<BlockItem> _inventoryItemSelectedAction;
-    private Action _inventoryItemUnselectedAction;
-    private List<UiBuildingItem> _uiItems;
-    private Blocks _blocks;
-
-    [SerializeField]
-    private UiBuildingItem _uiItemPrefab;
-
-    internal void Awake()
+    public class UiBuildingsInventory : MonoBehaviour
     {
-        _uiItems = new List<UiBuildingItem>();
-        _blocks = FindObjectOfType<Blocks>();
+        private UiBuildingItem _currentUiItem;
+        private Action<BlockItem> _inventoryItemSelectedAction;
+        private Action _inventoryItemUnselectedAction;
+        private List<UiBuildingItem> _uiItems;
+        private BlockList _blockList;
 
-        foreach (var item in _blocks.Items)
+        [SerializeField]
+        private UiBuildingItem _uiItemPrefab;
+
+        internal void Awake()
         {
-            var uiItem = Instantiate(_uiItemPrefab, transform);
-            uiItem.Init(item.Title, () => OnClick(item, uiItem));
-            _uiItems.Add(uiItem);
-        }
-    }
+            _uiItems = new List<UiBuildingItem>();
+            _blockList = FindObjectOfType<BlockList>();
 
-    public void WithInventoryItemListeners(Action<BlockItem> inventoryItemSelectedAction, Action inventoryItemUnselectedAction)
-    {
-        _inventoryItemSelectedAction = inventoryItemSelectedAction;
-        _inventoryItemUnselectedAction = inventoryItemUnselectedAction;
-    }
-
-    public void Reset()
-    {
-        _currentUiItem?.Unselect();
-        _currentUiItem = null;
-    }
-
-    public BlockItem Select(int index)
-    {
-        if (index >= _uiItems.Count)
-        {
-            index = index % _uiItems.Count;
+            foreach (var item in _blockList.Items)
+            {
+                var uiItem = Instantiate(_uiItemPrefab, transform);
+                uiItem.Init(item.Title, () => OnClick(item, uiItem));
+                _uiItems.Add(uiItem);
+            }
         }
 
-        OnClick(_blocks.Items[index], _uiItems[index]);
-        return _blocks.Items[index];
-    }
+        public void WithInventoryItemListeners(Action<BlockItem> inventoryItemSelectedAction, Action inventoryItemUnselectedAction)
+        {
+            _inventoryItemSelectedAction = inventoryItemSelectedAction;
+            _inventoryItemUnselectedAction = inventoryItemUnselectedAction;
+        }
 
-    private void OnClick(BlockItem item, UiBuildingItem uiItem)
-    {
-        _currentUiItem?.Unselect();
-        _inventoryItemUnselectedAction();
+        public void Reset()
+        {
+            _currentUiItem?.Unselect();
+            _currentUiItem = null;
+        }
 
-        _currentUiItem = uiItem;            
-        _currentUiItem?.Select();
-        _inventoryItemSelectedAction(item);        
+        public bool TrySelect(int index, out BlockItem item)
+        {
+            if (index >= _blockList.Items.Length || index < 0)
+            {
+                item = null;
+                return false;
+            }
+            OnClick(_blockList.Items[index], _uiItems[index]);
+            item = _blockList.Items[index];
+            return true;
+        }
+
+        private void OnClick(BlockItem item, UiBuildingItem uiItem)
+        {
+            _currentUiItem?.Unselect();
+            _inventoryItemUnselectedAction();
+
+            _currentUiItem = uiItem;            
+            _currentUiItem?.Select();
+            _inventoryItemSelectedAction(item);        
+        }
     }
 }
