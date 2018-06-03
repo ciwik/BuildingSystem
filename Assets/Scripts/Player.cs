@@ -40,7 +40,7 @@ public class Player : MonoBehaviour
     private void InitListeners()
     {
         _inputController.WithMoveListener(Move)
-            .WithRaycastingListener(_builder.PlaceBlock)
+            .WithRaycastListener(_builder.PlaceBlock)
             .WithBuildListeners(buildAction:_builder.Build, 
                 buildingCancelAction:_builder.ResetBuilding)
             .WithItemSelectListeners(blockItemSelectAction:_builder.StartBuilding, 

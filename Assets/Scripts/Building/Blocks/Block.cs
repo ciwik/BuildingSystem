@@ -6,10 +6,18 @@ public enum BlockType
     Wall
 }
 
-public class Block : MonoBehaviour
+public abstract class Block : MonoBehaviour
 {
-    public BlockType Type => _type;
+    //Instead of is/as
+    public abstract BlockType Type { get; }
 
-    [SerializeField]
-    private BlockType _type;    
+    public virtual bool CanBePlacedOn(Block other)
+    {
+        return other != null && Type != other.Type;
+    }
+
+    public abstract bool CanFitWith(Block other);
+
+    //Can be used if fitting depends on several neighbor blocks
+    public abstract bool CanFitWith(Block[] others);
 }

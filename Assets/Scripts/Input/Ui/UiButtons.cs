@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class Buttons : MonoBehaviour {
+public class UiButtons : MonoBehaviour {
     [SerializeField]
     private Button _buildButton;
     [SerializeField]

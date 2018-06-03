@@ -8,7 +8,7 @@ public class UiBuildingsInventory : MonoBehaviour
     private Action<BlockItem> _inventoryItemSelectedAction;
     private Action _inventoryItemUnselectedAction;
     private List<UiBuildingItem> _uiItems;
-    private Buildings _buildings;
+    private Blocks _blocks;
 
     [SerializeField]
     private UiBuildingItem _uiItemPrefab;
@@ -16,9 +16,9 @@ public class UiBuildingsInventory : MonoBehaviour
     internal void Awake()
     {
         _uiItems = new List<UiBuildingItem>();
-        _buildings = FindObjectOfType<Buildings>();
+        _blocks = FindObjectOfType<Blocks>();
 
-        foreach (var item in _buildings.Items)
+        foreach (var item in _blocks.Items)
         {
             var uiItem = Instantiate(_uiItemPrefab, transform);
             uiItem.Init(item.Title, () => OnClick(item, uiItem));
@@ -45,8 +45,8 @@ public class UiBuildingsInventory : MonoBehaviour
             index = index % _uiItems.Count;
         }
 
-        OnClick(_buildings.Items[index], _uiItems[index]);
-        return _buildings.Items[index];
+        OnClick(_blocks.Items[index], _uiItems[index]);
+        return _blocks.Items[index];
     }
 
     private void OnClick(BlockItem item, UiBuildingItem uiItem)

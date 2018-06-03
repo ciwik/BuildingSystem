@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Building;
 using UnityEngine;
 
 public class Builder : MonoBehaviour
@@ -46,13 +45,7 @@ public class Builder : MonoBehaviour
     }
 
     public bool PlaceBlock(RaycastHit raycastHit)
-    {
-        //TODO: remove
-        if (_block == null)
-        {
-            return false;
-        }
-
+    {        
         //If user try to build block on hill then refuse.
         //'raycastHit.normal.y < _normalThreshold' is the same as 'Vector3.Dot(raycastHit.normal, Vector3.up) < _normalThreshold',
         //because 'raycastHit.normal' is normalized
@@ -69,11 +62,12 @@ public class Builder : MonoBehaviour
         if (sphereIntersections.Length != 0)
         {
             Func<Collider, float> getDistance = col => Vector3.Distance(col.transform.position, raycastHit.point);
+            //Get block with minimum distance to current block
             var nearestBlock = sphereIntersections
                 .Aggregate((col1, col2) => getDistance(col1) < getDistance(col2) ? col1 : col2)
                 .gameObject.GetComponent<Block>();
 
-            var canBeFitted = AdhesionValidator.TryFit(nearestBlock, _block);
+            var canBeFitted = nearestBlock.CanFitWith(_block);
             return FillPreview(canBeFitted);
         }
 
@@ -104,6 +98,6 @@ public class Builder : MonoBehaviour
         }
 
         var otherBlock = otherObject.GetComponent<Block>();
-        return otherBlock != null && otherBlock.Type != _block.Type;
+        return _block.CanBePlacedOn(otherBlock);
     }
 }

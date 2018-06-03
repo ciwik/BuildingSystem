@@ -261,6 +261,7 @@ GameObject:
   m_Component:
   - component: {fileID: 257944818}
   - component: {fileID: 257944817}
+  - component: {fileID: 257944820}
   - component: {fileID: 257944819}
   m_Layer: 0
   m_Name: BuildingManager
@@ -306,15 +307,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 257944816}
   m_Enabled: 1
   m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af523d4f71a614f47a3ef3440b0628cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _type: 0
+--- !u!114 &257944820
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 257944816}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 21731c3fa75d83347b36190710d20462, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _items:
   - _title: Foundation
-    _prefab: {fileID: 114600170391869650, guid: f47702345991f7a4d91ba6c0d272f8cf,
+    _prefab: {fileID: 114272674663099884, guid: f47702345991f7a4d91ba6c0d272f8cf,
       type: 2}
   - _title: Wall
-    _prefab: {fileID: 114234019139913398, guid: b563757dd4c03e9419dcec6e3f1c231a,
+    _prefab: {fileID: 114982763463342294, guid: b563757dd4c03e9419dcec6e3f1c231a,
       type: 2}
 --- !u!1 &282840810
 GameObject:
@@ -1115,7 +1128,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _speed: 10
   _builder: {fileID: 0}
-  _buildingsInventory: {fileID: 958479134}
 --- !u!54 &1576952149
 Rigidbody:
   m_ObjectHideFlags: 0

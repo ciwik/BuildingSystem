@@ -23,7 +23,7 @@ namespace InputSystem
         {            
             var canvas = FindObjectOfType<Canvas>();
             _joystick = canvas.GetComponentInChildren<UiJoystick>(includeInactive: true);
-            var childs = canvas.GetComponentInChildren<Buttons>(includeInactive: true);
+            var childs = canvas.GetComponentInChildren<UiButtons>(includeInactive: true);
             _buildButton = childs.BuildButton;
             _buildCancelledButton = childs.BuildCancelledButton;
             _joystick.gameObject.SetActive(true);

@@ -5,16 +5,17 @@ namespace InputSystem
 {
     public abstract class AbstractInputController : MonoBehaviour, IInputController
     {
-        private Action<Vector3, Quaternion> _moveAction;        
+        private Action<Vector3, Quaternion> _moveAction;
         private Func<RaycastHit, bool> _raycastAction;
         private Action _buildAction;
-        private Action _buildingCancelAction;        
+        private Action _buildingCancelAction;
         private Action<BlockItem> _blockItemSelectAction;
         private Action _blockItemResetAction;
 
         private UiBuildingsInventory _buildingsInventory;
 
-        private Vector2 _sensitivity = new Vector2(1f, 1f);        
+        private Vector2 _sensitivity = new Vector2(1f, 1f);
+        private float _maxBuildingDistance = 30f;
         private bool _isBuilding;
 
         internal virtual void Awake()
@@ -35,13 +36,14 @@ namespace InputSystem
             return this;
         }
 
-        public IInputController WithRaycastingListener(Func<RaycastHit, bool> raycastAction)
+        public IInputController WithRaycastListener(Func<RaycastHit, bool> raycastAction)
         {
             _raycastAction = raycastAction;
             return this;
         }
 
-        public IInputController WithItemSelectListeners(Action<BlockItem> blockItemSelectAction, Action blockItemResetAction)
+        public IInputController WithItemSelectListeners(Action<BlockItem> blockItemSelectAction,
+            Action blockItemResetAction)
         {
             _blockItemSelectAction = b =>
             {
@@ -75,7 +77,7 @@ namespace InputSystem
         protected void CancelBuilding()
         {
             _buildingCancelAction();
-        }        
+        }
 
         protected void SelectItem(BlockItem item)
         {
@@ -85,7 +87,7 @@ namespace InputSystem
         protected void SelectItem(int itemIndex)
         {
             SelectItem(_buildingsInventory.Select(itemIndex));
-        }       
+        }
 
         private void UpdateMove()
         {
@@ -103,18 +105,18 @@ namespace InputSystem
         private void UpdateBuilding()
         {
             RaycastHit raycastHit;
-            var position = GetPositionOnScreen();            
+            var position = GetPositionOnScreen();
             var ray = Camera.main.ScreenPointToRay(position);
             if (Physics.Raycast(ray, out raycastHit))
             {
-                if (Vector3.Distance(Camera.main.transform.position, raycastHit.point) < 30f)
+                if (Vector3.Distance(Camera.main.transform.position, raycastHit.point) < _maxBuildingDistance)
                 {
                     if (_raycastAction(raycastHit) && IsPressed() && _isBuilding)
-                    {                        
+                    {
                         _buildAction();
                     }
-                }               
-            }                  
+                }
+            }
         }
 
         private void StartBuilding()

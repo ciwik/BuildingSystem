@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class Buildings : MonoBehaviour
+public class Blocks : MonoBehaviour
 {
     [SerializeField]
     private BlockItem[] _items;
